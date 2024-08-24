@@ -44,4 +44,7 @@ for variation in range(1, num_variations + 1):
 df_simulation = pd.DataFrame(simulation_results)
 
 # Visualizzazione dei risultati
-st.subheader(
+st.subheader("Risultati della Simulazione")
+st.line_chart(df_simulation)
+
+st.subheader("Tabella dei Pro
