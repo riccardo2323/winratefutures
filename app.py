@@ -14,8 +14,9 @@ num_trades = st.sidebar.number_input("Numero di Operazioni", min_value=1, max_va
 zero_trade_rate = st.sidebar.slider("Percentuale di Chiusura a 0 (%)", min_value=0, max_value=100, value=20) / 100
 win_rate = st.sidebar.slider("Percentuale di Vincita (%)", min_value=0, max_value=100, value=60) / 100
 
-# Calcolo della percentuale effettiva di vincita
-effective_win_rate = win_rate - zero_trade_rate
+# Calcolo delle percentuali effettive
+effective_win_rate = win_rate * (1 - zero_trade_rate)
+effective_loss_rate = 1 - effective_win_rate - zero_trade_rate
 
 num_variations = st.sidebar.number_input("Numero di Variazioni", min_value=1, max_value=20, value=10)
 
@@ -29,7 +30,7 @@ for variation in range(1, num_variations + 1):
         random_value = np.random.rand()
         if random_value <= zero_trade_rate:
             profit = 0  # Trade chiuso a 0
-        elif random_value <= effective_win_rate + zero_trade_rate:
+        elif random_value <= zero_trade_rate + effective_win_rate:
             # Trade vincente
             profit = (ticks_profit * profit_per_tick * contracts)
         else:
@@ -39,4 +40,8 @@ for variation in range(1, num_variations + 1):
     cumulative_profit = np.cumsum(profits)
     simulation_results[f'Variation {variation}'] = cumulative_profit
 
-# Creazion
+# Creazione del DataFrame per visualizzare i risultati
+df_simulation = pd.DataFrame(simulation_results)
+
+# Visualizzazione dei risultati
+st.subheader(
