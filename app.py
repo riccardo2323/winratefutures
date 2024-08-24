@@ -33,18 +33,4 @@ for variation in range(1, num_variations + 1):
         elif random_value <= zero_trade_rate + effective_win_rate:
             # Trade vincente
             profit = (ticks_profit * profit_per_tick * contracts)
-        else:
-            # Trade perdente
-            profit = -(ticks_loss * profit_per_tick * contracts)
-        profits.append(profit)
-    cumulative_profit = np.cumsum(profits)
-    simulation_results[f'Variation {variation}'] = cumulative_profit
-
-# Creazione del DataFrame per visualizzare i risultati
-df_simulation = pd.DataFrame(simulation_results)
-
-# Visualizzazione dei risultati
-st.subheader("Risultati della Simulazione")
-st.line_chart(df_simulation)
-
-st.subheader("Tabella dei Pro
+        
