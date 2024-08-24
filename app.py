@@ -43,5 +43,4 @@ df_simulation = pd.DataFrame(simulation_results)
 st.subheader("Risultati della Simulazione")
 st.line_chart(df_simulation)
 
-# Visualizzazione della tabella dei profitti cumulativi
-st.subheader("Tabella dei P
+# Visualizzazione della tabella dei profitti cumul
