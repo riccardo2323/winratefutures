@@ -1,7 +1,6 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 
 # Configurazione della pagina
 st.title("Simulatore di Trading basato sui Contratti")
@@ -16,7 +15,6 @@ win_rate = st.sidebar.slider("Percentuale di Vincita (%)", min_value=0, max_valu
 
 # Calcolo delle percentuali effettive
 effective_win_rate = win_rate * (1 - zero_trade_rate)
-effective_loss_rate = 1 - effective_win_rate - zero_trade_rate
 
 num_variations = st.sidebar.number_input("Numero di Variazioni", min_value=1, max_value=20, value=10)
 
@@ -31,6 +29,19 @@ for variation in range(1, num_variations + 1):
         if random_value <= zero_trade_rate:
             profit = 0  # Trade chiuso a 0
         elif random_value <= zero_trade_rate + effective_win_rate:
-            # Trade vincente
-            profit = (ticks_profit * profit_per_tick * contracts)
-        
+            profit = (ticks_profit * profit_per_tick * contracts)  # Trade vincente
+        else:
+            profit = -(ticks_loss * profit_per_tick * contracts)  # Trade perdente
+        profits.append(profit)
+    cumulative_profit = np.cumsum(profits)
+    simulation_results[f'Variation {variation}'] = cumulative_profit
+
+# Creazione del DataFrame per visualizzare i risultati
+df_simulation = pd.DataFrame(simulation_results)
+
+# Visualizzazione dei risultati
+st.subheader("Risultati della Simulazione")
+st.line_chart(df_simulation)
+
+# Visualizzazione della tabella dei profitti cumulativi
+st.subheader("Tabella dei P
