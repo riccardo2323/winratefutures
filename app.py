@@ -2,7 +2,6 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from scipy.interpolate import make_interp_spline
 import io
 
 # Configurazione della pagina
@@ -61,28 +60,19 @@ df_combined = pd.concat([df_simulation, df_ticks], axis=1).sort_index(axis=1, ke
 st.sidebar.subheader("Seleziona le Variazioni da Visualizzare")
 selected_variations = st.sidebar.multiselect("Variazioni", df_simulation.columns.tolist(), default=df_simulation.columns.tolist())
 
-# Calcolo della media dei profitti cumulativi
-average_cumulative_profit = df_simulation[selected_variations].iloc[-1].mean()
-
 # Mostra la media dei profitti cumulativi sotto il titolo
+average_cumulative_profit = df_simulation[selected_variations].iloc[-1].mean()
 st.subheader(f"Media dei Profitti Cumulativi: ${average_cumulative_profit:.2f}")
 
-# Interpolazione dei dati per linee più morbide
-def smooth_data(x, y):
-    x_new = np.linspace(x.min(), x.max(), 300)  # Aumenta il numero di punti per la curva liscia
-    spl = make_interp_spline(x, y, k=3)  # Interpolazione spline di grado 3
-    y_smooth = spl(x_new)
-    return x_new, y_smooth
-
-# Visualizzazione dei risultati
+# Interpolazione dei dati usando Pandas
 st.subheader("Risultati della Simulazione")
 fig, ax = plt.subplots()
 
 for variation in selected_variations:
-    x = np.arange(len(df_simulation[variation]))
     y = df_simulation[variation].values
-    x_smooth, y_smooth = smooth_data(x, y)
-    ax.plot(x_smooth, y_smooth, label=variation)
+    x = np.arange(len(y))
+    y_smooth = pd.Series(y).rolling(window=10, min_periods=1).mean()  # Usando una media mobile
+    ax.plot(x, y_smooth, label=variation)
 
 ax.legend()
 st.pyplot(fig)
