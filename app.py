@@ -1,6 +1,8 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import io
 
 # Configurazione della pagina
 st.title("Simulatore di Trading basato sui Contratti")
@@ -14,6 +16,10 @@ fee_per_contract = st.sidebar.number_input("Costo delle Fee per Contratto ($)", 
 num_trades = st.sidebar.number_input("Numero di Operazioni", min_value=1, max_value=1000, value=200)
 zero_trade_rate = st.sidebar.slider("Percentuale di Chiusura a 0 (%)", min_value=0, max_value=100, value=10) / 100
 win_rate = st.sidebar.slider("Percentuale di Vincita (%)", min_value=0, max_value=100, value=60) / 100
+
+# Sezione colori del grafico
+st.sidebar.subheader("Personalizza il Grafico")
+line_color = st.sidebar.color_picker("Colore della Linea", "#00f900")
 
 # Calcolo delle percentuali effettive
 adjusted_win_rate = win_rate * (1 - zero_trade_rate)
@@ -44,9 +50,16 @@ df_simulation = pd.DataFrame(simulation_results)
 # Calcolo della media dei profitti cumulativi
 average_cumulative_profit = df_simulation.iloc[-1].mean()
 
+# Calcolo del drawdown massimo
+drawdown = df_simulation.cummax() - df_simulation
+max_drawdown = drawdown.max().max()
+
+# Calcolo del Sharpe ratio (approssimativo)
+sharpe_ratio = (df_simulation.mean().mean() / df_simulation.std().mean()) * np.sqrt(252)
+
 # Visualizzazione dei risultati
 st.subheader("Risultati della Simulazione")
-st.line_chart(df_simulation)
+st.line_chart(df_simulation, use_container_width=True)
 
 # Visualizzazione della tabella dei profitti cumulativi
 st.subheader("Tabella dei Profitti Cumulativi")
@@ -54,3 +67,17 @@ st.dataframe(df_simulation)
 
 # Visualizzazione della media dei profitti cumulativi
 st.subheader(f"Media dei Profitti Cumulativi: ${average_cumulative_profit:.2f}")
+
+# Visualizzazione del drawdown massimo
+st.subheader(f"Drawdown Massimo: ${max_drawdown:.2f}")
+
+# Visualizzazione del Sharpe Ratio
+st.subheader(f"Sharpe Ratio: {sharpe_ratio:.2f}")
+
+# Download dei risultati come CSV
+st.subheader("Scarica i Risultati")
+csv = df_simulation.to_csv(index=False)
+b = io.BytesIO()
+b.write(csv.encode())
+b.seek(0)
+st.download_button(label="Scarica come CSV", data=b, file_name="simulation_results.csv", mime="text/csv")
