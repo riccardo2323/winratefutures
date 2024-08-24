@@ -60,26 +60,16 @@ df_combined = pd.concat([df_simulation, df_ticks], axis=1).sort_index(axis=1, ke
 st.sidebar.subheader("Seleziona le Variazioni da Visualizzare")
 selected_variations = st.sidebar.multiselect("Variazioni", df_simulation.columns.tolist(), default=df_simulation.columns.tolist())
 
-# Mostra la media dei profitti cumulativi sotto il titolo
-average_cumulative_profit = df_simulation[selected_variations].iloc[-1].mean()
-st.subheader(f"Media dei Profitti Cumulativi: ${average_cumulative_profit:.2f}")
-
-# Interpolazione dei dati usando Pandas
+# Visualizzazione dei risultati
 st.subheader("Risultati della Simulazione")
-fig, ax = plt.subplots()
-
-for variation in selected_variations:
-    y = df_simulation[variation].values
-    x = np.arange(len(y))
-    y_smooth = pd.Series(y).rolling(window=10, min_periods=1).mean()  # Usando una media mobile
-    ax.plot(x, y_smooth, label=variation)
-
-ax.legend()
-st.pyplot(fig)
+st.line_chart(df_simulation[selected_variations], use_container_width=True)
 
 # Visualizzazione della tabella dei profitti cumulativi e dei tick
 st.subheader("Tabella dei Profitti Cumulativi e Tick Utilizzati")
 st.dataframe(df_combined)
+
+# Calcolo della media dei profitti cumulativi
+average_cumulative_profit = df_simulation[selected_variations].iloc[-1].mean()
 
 # Calcolo del drawdown massimo
 drawdown = df_simulation[selected_variations].cummax() - df_simulation[selected_variations]
@@ -87,6 +77,9 @@ max_drawdown = drawdown.max().max()
 
 # Calcolo del Sharpe ratio (approssimativo)
 sharpe_ratio = (df_simulation[selected_variations].mean().mean() / df_simulation[selected_variations].std().mean()) * np.sqrt(252)
+
+# Visualizzazione della media dei profitti cumulativi
+st.subheader(f"Media dei Profitti Cumulativi: ${average_cumulative_profit:.2f}")
 
 # Visualizzazione del drawdown massimo
 st.subheader(f"Drawdown Massimo: ${max_drawdown:.2f}")
