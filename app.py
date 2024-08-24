@@ -12,6 +12,7 @@ ticks_profit = st.sidebar.number_input("Ticks di Profitto", min_value=1, max_val
 ticks_loss = st.sidebar.number_input("Ticks di Perdita", min_value=1, max_value=10, value=5)
 num_trades = st.sidebar.number_input("Numero di Operazioni", min_value=1, max_value=1000, value=200)
 win_rate = st.sidebar.slider("Percentuale di Vincita (%)", min_value=0, max_value=100, value=60) / 100
+zero_trade_rate = st.sidebar.slider("Percentuale di Chiusura a 0 (%)", min_value=0, max_value=100, value=20) / 100
 num_variations = st.sidebar.number_input("Numero di Variazioni", min_value=1, max_value=20, value=10)
 
 # Simulazione
@@ -21,7 +22,10 @@ simulation_results = {}
 for variation in range(1, num_variations + 1):
     profits = []
     for _ in range(num_trades):
-        if np.random.rand() <= win_rate:
+        random_value = np.random.rand()
+        if random_value <= zero_trade_rate:
+            profit = 0  # Trade chiuso a 0
+        elif random_value <= win_rate:
             # Trade vincente
             profit = (ticks_profit * profit_per_tick * contracts)
         else:
