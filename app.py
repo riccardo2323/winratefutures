@@ -41,6 +41,9 @@ for variation in range(1, num_variations + 1):
 # Creazione del DataFrame per visualizzare i risultati
 df_simulation = pd.DataFrame(simulation_results)
 
+# Calcolo della media dei profitti cumulativi
+average_cumulative_profit = df_simulation.iloc[-1].mean()
+
 # Visualizzazione dei risultati
 st.subheader("Risultati della Simulazione")
 st.line_chart(df_simulation)
@@ -48,3 +51,6 @@ st.line_chart(df_simulation)
 # Visualizzazione della tabella dei profitti cumulativi
 st.subheader("Tabella dei Profitti Cumulativi")
 st.dataframe(df_simulation)
+
+# Visualizzazione della media dei profitti cumulativi
+st.subheader(f"Media dei Profitti Cumulativi: ${average_cumulative_profit:.2f}")
