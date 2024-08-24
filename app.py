@@ -9,17 +9,14 @@ st.title("Simulatore di Trading basato sui Contratti")
 
 # Input dell'utente
 contracts = st.sidebar.selectbox("Numero di Contratti", [1, 2, 3, 4])
-ticks_profit = st.sidebar.number_input("Ticks di Profitto", min_value=1, max_value=10, value=5)
+min_ticks_profit = st.sidebar.number_input("Minimo Ticks di Profitto", min_value=1, max_value=10, value=3)
+max_ticks_profit = st.sidebar.number_input("Massimo Ticks di Profitto", min_value=1, max_value=10, value=7)
 ticks_loss = st.sidebar.number_input("Ticks di Perdita", min_value=1, max_value=10, value=5)
 tick_value = st.sidebar.number_input("Valore del Tick ($)", min_value=0.01, value=12.5, step=0.01)
 fee_per_contract = st.sidebar.number_input("Costo delle Fee per Contratto ($)", min_value=0.01, value=2.5, step=0.01)
 num_trades = st.sidebar.number_input("Numero di Operazioni", min_value=1, max_value=1000, value=200)
 zero_trade_rate = st.sidebar.slider("Percentuale di Chiusura a 0 (%)", min_value=0, max_value=100, value=10) / 100
 win_rate = st.sidebar.slider("Percentuale di Vincita (%)", min_value=0, max_value=100, value=60) / 100
-
-# Sezione colori del grafico
-st.sidebar.subheader("Personalizza il Grafico")
-line_color = st.sidebar.color_picker("Colore della Linea", "#00f900")
 
 # Calcolo delle percentuali effettive
 adjusted_win_rate = win_rate * (1 - zero_trade_rate)
@@ -37,7 +34,8 @@ for variation in range(1, num_variations + 1):
         if random_value <= zero_trade_rate:
             profit = -(fee_per_contract * contracts * 2)  # Solo fee pagate in apertura e chiusura
         elif random_value <= zero_trade_rate + adjusted_win_rate:
-            profit = (ticks_profit * tick_value * contracts) - (fee_per_contract * contracts * 2)  # Trade vincente meno fee
+            random_ticks_profit = np.random.randint(min_ticks_profit, max_ticks_profit + 1)
+            profit = (random_ticks_profit * tick_value * contracts) - (fee_per_contract * contracts * 2)  # Trade vincente meno fee
         else:
             profit = -(ticks_loss * tick_value * contracts) - (fee_per_contract * contracts * 2)  # Trade perdente più fee
         profits.append(profit)
